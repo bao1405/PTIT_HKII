@@ -10,6 +10,7 @@ import AddElement from './components/AddElement'
 import Exercise07 from './components/Exrecise07'
 import Form from './components/Form'
 import Random from './components/Random'
+import Notification from './components/Notification'
 
 export default class App extends Component {
   render() {
@@ -27,6 +28,7 @@ export default class App extends Component {
         <Exercise07></Exercise07>
         <Form></Form>
         <Random></Random>
+        <Notification></Notification>
         </div>
     )
   }
