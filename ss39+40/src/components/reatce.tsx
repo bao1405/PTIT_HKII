@@ -1,75 +1,61 @@
 import React, { useState } from 'react';
 
 const EmployeeManagementApp: React.FC = () => {
-  // State cho danh sách công việc
   const [tasks, setTasks] = useState([
-    { 
-        id: 1, 
-        name: 'Quét nhà', 
-        completed: true 
-    },
-    { 
-        id: 2, 
-        name: 'Giặt quần áo', 
-        completed: false 
-    }
+    { id: 1, name: 'Quét nhà', completed: true },
+    { id: 2, name: 'Giặt quần áo', completed: false }
   ]);
 
-  // State cho tên công việc mới và hiển thị modal
   const [newTaskName, setNewTaskName] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [taskIdToDelete, setTaskIdToDelete] = useState<number | null>(null);
 
-  // Hàm xử lý thay đổi input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTaskName(e.target.value);
   };
 
-  // Hàm xử lý submit form thêm công việc
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newTaskName.trim()) {
-      // Hiển thị modal cảnh báo khi tên công việc trống
       setModalVisible(true);
       return;
     }
     const isDuplicate = tasks.some(task => task.name === newTaskName);
     if (isDuplicate) {
-      // Hiển thị modal cảnh báo khi tên công việc trùng
       setModalVisible(true);
       return;
     }
-    const newTask = {
-      id: tasks.length + 1,
-      name: newTaskName,
-      completed: false
-    };
+    const newTask = { id: tasks.length + 1, name: newTaskName, completed: false };
     setTasks([...tasks, newTask]);
     setNewTaskName('');
+    localStorage.setItem('tasks', JSON.stringify([...tasks, newTask]));
   };
 
-  // Hàm xử lý toggle công việc đã hoàn thành
   const handleTaskToggle = (taskId: number) => {
     const updatedTasks = tasks.map(task =>
       task.id === taskId ? { ...task, completed: !task.completed } : task
     );
     setTasks(updatedTasks);
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
 
-  // Hàm xử lý xóa công việc
   const handleDeleteTask = (taskId: number) => {
-    // Hiển thị modal xác nhận xóa công việc
     setModalVisible(true);
+    setTaskIdToDelete(taskId);
+  };
 
-    // Hàm xác nhận xóa công việc
-    const confirmDelete = () => {
-      const updatedTasks = tasks.filter(task => task.id !== taskId);
+  const confirmDelete = () => {
+    if (taskIdToDelete !== null) {
+      const updatedTasks = tasks.filter(task => task.id !== taskIdToDelete);
       setTasks(updatedTasks);
+      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
       setModalVisible(false);
-    };
+    }
+  };
 
-    const cancelDelete = () => {
-      setModalVisible(false);
-    };
+  const cancelDelete = () => {
+    setModalVisible(false);
+    setTaskIdToDelete(null);
   };
 
   return (
@@ -90,9 +76,9 @@ const EmployeeManagementApp: React.FC = () => {
                       className="form-control"
                       value={newTaskName}
                       onChange={handleInputChange}
+                      placeholder='Nhập tên công việc'
                     />
                     <label className="form-label" htmlFor="form2">
-                      Nhập tên công việc
                     </label>
                   </div>
                   <button type="submit" className="btn btn-info ms-2">
@@ -100,14 +86,13 @@ const EmployeeManagementApp: React.FC = () => {
                   </button>
                 </form>
 
-                {/* Bảng hiển thị danh sách công việc */}
                 <table className="table">
                   <thead>
                     <tr>
-                      <th>#</th>
-                      <th>Tên công việc</th>
-                      <th>Hoàn thành</th>
-                      <th>Thao tác</th>
+                      <th>STT</th>
+                      <th><a href="">Tên công việc</a></th>
+                      <th><a href="">Hoàn thành</a></th>
+                      <th><a href="">Thao tác</a></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -123,14 +108,8 @@ const EmployeeManagementApp: React.FC = () => {
                           />
                         </td>
                         <td>
-                          <button className="btn btn-sm btn-warning me-2">
-                            <i className="fas fa-pen-to-square"></i>
-                          </button>
-                          <button
-                            className="btn btn-sm btn-danger"
-                            onClick={() => handleDeleteTask(task.id)}
-                          >
-                            <i className="far fa-trash-can"></i>
+                          <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTask(task.id)}>
+                            Xóa
                           </button>
                         </td>
                       </tr>
@@ -142,20 +121,23 @@ const EmployeeManagementApp: React.FC = () => {
           </div>
         </div>
       </div>
+
       {/* Modal xác nhận xóa */}
       {modalVisible && (
-        <div className="overlay">
-          <div className="modal-custom">
-            <div className="modal-header-custom">
-              <h5>Xác nhận</h5>
-              <i className="fas fa-xmark" onClick={cancelDelete}></i>
-            </div>
-            <div className="modal-body-custom">
-              <p>Bạn chắc chắn muốn xóa công việc này?</p>
-            </div>
-            <div className="modal-footer-footer">
-              <button className="btn btn-light" onClick={cancelDelete}>Hủy</button>
-              <button className="btn btn-danger" onClick={confirmDelete}>Xóa</button>
+        <div className="modal fade show" style={{ display: 'block' }} tabIndex={-1}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h2 className="modal-title">Xác nhận</h2>
+                <button type="button" className="btn-close" aria-label="Close" onClick={cancelDelete}>X</button>
+              </div>
+              <div className="modal-body">
+                <p>Bạn có chắc chắn muốn xóa công việc này?</p>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn-btn-secondary" onClick={cancelDelete}>Hủy</button>
+                <button type="button" className="btn-btn-danger" onClick={confirmDelete}>Xóa</button>
+              </div>
             </div>
           </div>
         </div>
