@@ -105,6 +105,14 @@ table td{
   align-items: center;
 }
 
+.btn.btn-info.ms-2{
+  background-color: rgb(84, 180, 211);
+  border:0cap;
+  height: 25px;
+  width: 80px;
+  color: white;
+}
+
 .modal {
   background-color: white; /* Bảng màu trắng */
   position: absolute;
@@ -153,5 +161,9 @@ table td{
   height: 30px;
   width: 50px;
   border-radius: 3px;
+  cursor: pointer;
+}
+
+button{
   cursor: pointer;
 }
