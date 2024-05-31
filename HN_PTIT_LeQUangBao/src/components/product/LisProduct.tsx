@@ -69,7 +69,6 @@ const ShoppingCart: React.FC = () => {
             setNotification('');
         }, 3000); // Ẩn thông báo sau 3 giây
         setCartUpdated(true); // Đặt trạng thái này thành true để làm mới trang
-        setPriceClickNotification(''); // Reset thông báo khi thêm thành công
     };
 
     useEffect(() => {
